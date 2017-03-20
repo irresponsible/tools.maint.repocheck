@@ -10,15 +10,9 @@ our $VERSION = '0.001000';
 
 # AUTHORITY
 
-use My::Generic::Assertions::Capture;
 use Term::ANSIColor qw( colored );
 use Generic::Assertions;
 use parent "Generic::Assertions";
-
-sub with {
-    my ( $self, $item ) = @_;
-    return My::Generic::Assertions::Capture->new( $self, $item );
-}
 
 sub get {
     my ( $self, $name, @slurpy ) = @_;
