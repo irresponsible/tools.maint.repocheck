@@ -21,6 +21,12 @@ our $ASSERT_YAML = My::Generic::Assertions->new(
     '-tests'             => { have_dpath => \&test_have_dpath },
     '-get_handler'       => \&handle_get,
 );
+sub import {
+  if ( grep /\Ayaml\z/, @_[1..$#_] ) {
+    no strict;
+    *{ caller . '::yaml'} = \&assert
+  }
+}
 
 sub assert { $ASSERT_YAML }
 

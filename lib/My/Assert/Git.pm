@@ -23,6 +23,13 @@ our $ASSERT_GIT = My::Generic::Assertions->new(
     '-get_handler' => \&handle_get,
 );
 
+sub import {
+  if ( grep /\Agit\z/, @_[1..$#_] ) {
+    no strict;
+    *{ caller . '::git'} = \&assert
+  }
+}
+
 sub assert { $ASSERT_GIT }
 
 sub transform_input {

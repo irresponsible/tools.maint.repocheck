@@ -21,6 +21,14 @@ our $ASSERT_PATH = My::Generic::Assertions->new(
     },
     '-get_handler' => \&handle_get,
 );
+
+sub import {
+  if ( grep /\Apath\z/, @_[1..$#_] ) {
+    no strict;
+    *{ caller . '::path'} = \&assert
+  }
+}
+
 sub assert { $ASSERT_PATH }
 
 our %linecache;
