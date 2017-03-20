@@ -9,30 +9,48 @@ use My::Assert::Path qw/path/;
 use My::Assert::YAML qw/yaml/;
 use My::Assert::Git qw/git/;
 
-our $BOOT_VERSION    = '2.7.1';
-our $CLOJURE_VERSION = '1.9.0-alpha15';
+use constant BOOT_VERSION    => '2.7.1';
+use constant CLOJURE_VERSION => '1.9.0-alpha15';
 
-check_boot_properties('boot.properties');
+check_boot_properties(
+    'boot.properties' => {
+        boot_version    => BOOT_VERSION,
+        clojure_version => CLOJURE_VERSION,
+    },
+);
 check_build_boot('build.boot');
 check_changelog('CHANGELOG');
 check_readme('README.md');
-check_travis_yml('.travis.yml');
+check_travis_yml(
+    '.travis.yml' => {
+        boot_version => BOOT_VERSION,
+    },
+);
 check_gitignore('.gitignore');
-check_jitpack_yml('jitpack.yml');
+check_jitpack_yml(
+    'jitpack.yml' => {
+        boot_version => BOOT_VERSION,
+    },
+);
 check_mailmap('.mailmap');
 check_resources('resources');
 
+exit;
+
 sub check_boot_properties {
-    my ($file) = @_;
+    my ( $file, $opts ) = @_;
+    my $boot_version = $opts->{boot_version};
+    my $clj_version  = $opts->{clojure_version};
+
     path->should( 'exist' => $file );
     next unless path->test( 'exist' => $file );
     path->should(
         have_line_matching => $file,
-        qr/\ABOOT_CLOJURE_VERSION=\Q$CLOJURE_VERSION\E\z/
+        qr/\ABOOT_CLOJURE_VERSION=\Q$clj_version\E\z/
     );
     path->should(
         have_line_matching => $file,
-        qr/\ABOOT_VERSION=\Q$BOOT_VERSION\E\z/
+        qr/\ABOOT_VERSION=\Q$boot_version\E\z/
     );
 
 }
@@ -88,16 +106,18 @@ sub check_readme {
 }
 
 sub check_travis_yml {
-    my ($file) = @_;
+    my ( $file, $opts ) = @_;
+
     path->should( exist => $file );
     next unless path->test( exist => $file );
 
+    my $boot_version = $opts->{boot_version};
     my $jdk8_rule =
       '//matrix/include/*/*[ key eq q[jdk] && value eq q[oraclejdk8] ]';
 
     my $boot_rule =
         '//matrix/include/*/*[ key eq "env" && value =~ /BOOT_VERSION=\Q'
-      . $BOOT_VERSION
+      . $boot_version
       . '\E/  ]';
 
     yaml->should( have_dpath => $file, $jdk8_rule );
@@ -118,12 +138,13 @@ sub check_gitignore {
 }
 
 sub check_jitpack_yml {
-    my ($file) = @_;
+    my ( $file, $opts ) = @_;
     path->should( exist => $file );
     return unless path->test( exist => $file );
 
+    my $boot_version = $opts->{boot_version};
     my $dpath_rule =
-      '//env/*[ key eq "BOOT_VERSION" && value eq "' . $BOOT_VERSION . '" ]';
+      '//env/*[ key eq "BOOT_VERSION" && value eq "' . $boot_version . '" ]';
     yaml->should( have_dpath => $file, '//jdk' );
     yaml->should( have_dpath => $file, $dpath_rule );
 }
