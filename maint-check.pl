@@ -2,6 +2,9 @@
 use strict;
 use warnings;
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
 use Git::Wrapper ();
 
 our $BOOT_VERSION    = '2.7.1';
@@ -101,34 +104,9 @@ for ( path->with('resources') ) {
 
 BEGIN {
 
-    package My::Generic::Assertions::Capture;
-
-    sub new {
-        my ( $self, $assertion, $item ) = @_;
-        bless [ $assertion, $item ], $self;
-    }
-
-    sub should {
-        my ( $self, $action, @slurpy ) = @_;
-        $self->[0]->should( $action, $self->[1], @slurpy );
-    }
-
-    sub test {
-        my ( $self, $action, @slurpy ) = @_;
-        $self->[0]->test( $action, $self->[1], @slurpy );
-    }
-
-    sub get {
-        my ( $self, $action, @slurpy ) = @_;
-        $self->[0]->get( $action, $self->[1], @slurpy );
-    }
-
-}
-
-BEGIN {
-
     package My::Generic::Assertions;
 
+    use My::Generic::Assertions::Capture;
     use Term::ANSIColor qw( colored );
 
     use parent "Generic::Assertions";
