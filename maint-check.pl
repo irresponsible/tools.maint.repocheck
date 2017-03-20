@@ -51,6 +51,13 @@ sub check_changelog {
     git()->should('be_in_git');
     return unless git()->test('be_in_git');
 
+    check_changelog_has_tags($file);
+    check_tags_for_changelog($file);
+}
+
+sub check_changelog_has_tags {
+    my ($file) = @_;
+    git()->must('be_in_git');
     for my $tag ( git()->get('tags') ) {
         next unless $tag =~ /\Av?(\d.*)\z/;
         my $version = $1;
@@ -60,6 +67,12 @@ sub check_changelog {
             "Version = $version"
         );
     }
+}
+
+sub check_tags_for_changelog {
+    my ($file) = @_;
+    git()->must('be_in_git');
+
     for my $line ( path->get( 'lines', $file ) ) {
         next unless $line =~ /\Av?(\d[^\s]*)(?:$|\s+-\s+\S)/;
         my $version = $1;
@@ -67,7 +80,6 @@ sub check_changelog {
           ->should( 'have_tag_matching', qr/\Av?\Q$version\E\z/,
             "Version = $version" );
     }
-
 }
 
 sub check_readme {
