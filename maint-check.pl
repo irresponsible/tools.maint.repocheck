@@ -7,8 +7,7 @@ use lib "$FindBin::Bin/lib";
 
 use My::Assert::Path;
 use My::Assert::YAML;
-
-use Git::Wrapper ();
+use My::Assert::Git;
 
 our $BOOT_VERSION    = '2.7.1';
 our $CLOJURE_VERSION = '1.9.0-alpha15';
@@ -104,56 +103,3 @@ for ( path->with('resources') ) {
     next unless $_->test('exist');
     path->should( exist => 'resources/README.md' );
 }
-
-use My::Generic::Assertions;
-
-BEGIN {
-
-    package My::Assert::Git;
-
-    our $WRAPPER;
-
-    use YAML::XS qw();
-
-    our $ASSERT_GIT = My::Generic::Assertions->new(
-        '-input_transformer' => \&transform_input,
-        -tests               => {
-            be_in_git         => \&test_be_in_git,
-            have_tag_matching => \&test_have_tag_matching,
-        },
-        '-get_handler' => \&handle_get,
-    );
-
-    sub assert { $ASSERT_GIT }
-
-    sub transform_input {
-        $WRAPPER ||= Git::Wrapper->new('.');
-        return @_;
-    }
-
-    sub test_be_in_git {
-        return ( 0, "Not in a valid git repo" )
-          unless eval { $WRAPPER->status; 1 };
-        return ( 1, "In a valid git repo" );
-    }
-
-    sub handle_get {
-        my ( $name, @args ) = @_;
-        my $coderef = __PACKAGE__->can( 'get_' . $name );
-        die "No such getter get_$name" unless $coderef;
-        $coderef->(@args);
-    }
-
-    sub get_tags {
-        $WRAPPER->tag();
-    }
-
-    sub test_have_tag_matching {
-        my ( $name, $regex ) = @_;
-        my $smessage = !$_[2] ? "" : " ( $_[2] )";
-        return ( 0, "No such tag matching ${regex}${smessage}" )
-          unless grep { $_ =~ $regex } $WRAPPER->tag;
-        return ( 1, "Has tag matching ${regex}${smessage}" );
-    }
-}
-
