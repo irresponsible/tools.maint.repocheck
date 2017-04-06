@@ -43,7 +43,7 @@ sub check_boot_properties {
     my $clj_version  = $opts->{clojure_version};
 
     path->should( 'exist' => $file );
-    next unless path->test( 'exist' => $file );
+    return unless path->test( 'exist' => $file );
     path->should(
         have_line_matching => $file,
         qr/\ABOOT_CLOJURE_VERSION=\Q$clj_version\E\z/
@@ -109,7 +109,7 @@ sub check_travis_yml {
     my ( $file, $opts ) = @_;
 
     path->should( exist => $file );
-    next unless path->test( exist => $file );
+    return unless path->test( exist => $file );
 
     my $boot_version = $opts->{boot_version};
     my $jdk8_rule =
@@ -131,7 +131,7 @@ sub check_travis_yml {
 sub check_gitignore {
     my ($file) = @_;
     path->should( exist => $file );
-    next unless path->test( exist => $file );
+    return unless path->test( exist => $file );
     path->should( have_line_matching => $file, qr{\A/target} );
     path->should( have_line_matching => $file, qr{\A\.nrepl-\*\z} );
     path->should( have_line_matching => $file, qr{\A\*~\z} );
