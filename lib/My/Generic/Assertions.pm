@@ -31,8 +31,9 @@ sub _get_handler {
 
 sub _handler_defaults {
     my $defaults = $_[0]->Generic::Assertions::_handler_defaults();
-    $defaults->{should} = \&handle_should;
-    $defaults->{test}   = \&handle_test;
+    $defaults->{should}     = \&handle_should;
+    $defaults->{should_not} = \&handle_should_not;
+    $defaults->{test}       = \&handle_test;
     return $defaults;
 }
 
@@ -43,6 +44,16 @@ sub handle_should {
     my $cbang = colored( [ 'bold', 'yellow' ], '!' );
     warn "   should $name: $message\n" if $status and $ENV{DEBUG};
     warn " ${cbang} should $cname > $cmessage\n" unless $status;
+    return $status;
+}
+
+sub handle_should_not {
+    my ( $status, $message, $name, @slurpy ) = @_;
+    my $cname    = colored( ['yellow'], $name );
+    my $cmessage = colored( ['yellow'], $message );
+    my $cbang = colored( [ 'bold', 'yellow' ], '!' );
+    warn "   should not $name: $message\n" if not $status and $ENV{DEBUG};
+    warn " ${cbang} should not $cname > $cmessage\n" if $status;
     return $status;
 }
 
