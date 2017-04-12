@@ -113,19 +113,51 @@ sub check_travis_yml {
 
     my $boot_version = $opts->{boot_version};
     my $jdk8_rule =
-      '//matrix/include/*/*[ key eq q[jdk] && value eq q[oraclejdk8] ]';
-
-    my $boot_rule =
-        '//matrix/include/*/*[ key eq "env" && value =~ /BOOT_VERSION=\Q'
-      . $boot_version
-      . '\E/  ]';
+      '//matrix/include/*/*[ key eq q[env] && value eq q[JDK=zulu8] ]';
 
     yaml->should( have_dpath => $file, $jdk8_rule );
     yaml->should( have_dpath => $file, '//cache' );
+    yaml->should( have_dpath => $file, '//language[ value eq q{generic} ]' );
+    yaml->should(
+        have_dpath => $file,
+        '//cache/directories/*[ value =~ qr{$HOME/zulu} ]'
+    );
+    yaml->should( have_dpath => $file, '//matrix/allow_failures' );
     yaml->should( have_dpath => $file, '//sudo' );
     yaml->should( have_dpath => $file, '//script' );
     yaml->should( have_dpath => $file, '//install' );
-    yaml->should( have_dpath => $file, $boot_rule );
+    yaml->should(
+        have_dpath => $file,
+        '//before_install/*[ value =~ qr{curl.*init.sh} ]'
+    );
+    yaml->should(
+        have_dpath => $file,
+        '//before_install/*[ value =~ qr{source init.sh} ]'
+    );
+    yaml->should(
+        have_dpath => $file,
+        '//before_install/*[ value =~ qr{install_jdk} ]'
+    );
+    yaml->should(
+        have_dpath => $file,
+        '//before_install/*[ value =~ qr{install_boot} ]'
+    );
+    yaml->should(
+        have_dpath => $file,
+        '//before_install/*[ value =~ qr{setup_boot_env} ]'
+    );
+    yaml->should_not(
+        have_dpath => $file,
+        '//install/*[ value =~ qr{curl.*boot.sh} ]'
+    );
+    yaml->should_not(
+        have_dpath => $file,
+        '//install/*[ value =~ qr{chmod.*boot} ]'
+    );
+    yaml->should_not(
+        have_dpath => $file,
+        '//install/*[ value =~ qr{export BOOT_JVM_OPTIONS=} ]'
+    );
 }
 
 sub check_gitignore {
@@ -145,8 +177,29 @@ sub check_jitpack_yml {
     my $boot_version = $opts->{boot_version};
     my $dpath_rule =
       '//env/*[ key eq "BOOT_VERSION" && value eq "' . $boot_version . '" ]';
-    yaml->should( have_dpath => $file, '//jdk' );
-    yaml->should( have_dpath => $file, $dpath_rule );
+    yaml->should_not( have_dpath => $file, '//jdk' );
+    yaml->should_not( have_dpath => $file, '//env' );
+    yaml->should_not( have_dpath => $file, $dpath_rule );
+    yaml->should(
+        have_dpath => $file,
+        '//before_install/*[ value =~ qr{curl.*init.sh} ]'
+    );
+    yaml->should(
+        have_dpath => $file,
+        '//before_install/*[ value =~ qr{source init.sh} ]'
+    );
+    yaml->should(
+        have_dpath => $file,
+        '//before_install/*[ value =~ qr{install_jdk} ]'
+    );
+    yaml->should(
+        have_dpath => $file,
+        '//before_install/*[ value =~ qr{install_boot} ]'
+    );
+    yaml->should(
+        have_dpath => $file,
+        '//before_install/*[ value =~ qr{setup_boot_env} ]'
+    );
 }
 
 sub check_mailmap {
