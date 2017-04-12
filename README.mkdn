@@ -1,0 +1,128 @@
+### Not for public consumption
+
+This is a toolkit @kentfredric has thrown together for sanity
+checking clojure projects he's working on shipping.
+
+Its main job is just making sure that:
+
+1. All the files that are typically in a project are there
+2. All the files that are in the project contain what they're
+   supposed to contain
+3. Any specific tooling behaviours that we didn't used to do,
+   but now do, are encouraged
+4. Any specific tooling behaviours that we used to do, but no
+   longer do, are discouraged.
+
+But to clarify, most of the output of this tool should be
+considered **suggestions**, not binary edicts.
+
+For some projects, the suggestions are likely to be wrong, and
+that's OK.
+
+### Checkout
+
+This tool requires some familiarity with Perl to use.
+
+However, the following should be sufficient to get going provided
+you've already installed/configured your Perl environement,
+and have already got
+[cpanm](https://metacpan.org/pod/distribution/App-cpanminus/bin/cpanm)
+installed.
+
+```shell
+git clone https://github.com/irresponsible/tools.maint.repocheck
+cd tools.maint.repocheck
+cpanm --installdeps .
+```
+
+
+### Usage
+
+```shell
+cd $PROJECT_ROOT
+perl $PATH_TO_TOOLSDIR/maint-check.pl
+```
+
+### Example Output
+
+Here's an example based on a project that needs a bit of work done.
+
+Its a little nicer in reality because it has colours :)
+
+```
+ ! should have_tag_matching > No such tag matching (?^:\Av?0\.1\.1\z) ( Version = 0.1.1 )
+ ! should have_dpath > .travis.yml does not have dpath //matrix/include/*/*[ key eq q[env] && value eq q[JDK=zulu8] ]
+ ! should have_dpath > .travis.yml does not have dpath //language[ value eq q{generic} ]
+ ! should have_dpath > .travis.yml does not have dpath //cache/directories/*[ value =~ qr{$HOME/zulu} ]
+ ! should have_dpath > .travis.yml does not have dpath //matrix/allow_failures
+ ! should have_dpath > .travis.yml does not have dpath //before_install/*[ value =~ qr{curl.*init.sh} ]
+ ! should have_dpath > .travis.yml does not have dpath //before_install/*[ value =~ qr{source init.sh} ]
+ ! should have_dpath > .travis.yml does not have dpath //before_install/*[ value =~ qr{install_jdk} ]
+ ! should have_dpath > .travis.yml does not have dpath //before_install/*[ value =~ qr{install_boot} ]
+ ! should have_dpath > .travis.yml does not have dpath //before_install/*[ value =~ qr{setup_boot_env} ]
+ ! should not have_dpath > .travis.yml has dpath //install/*[ value =~ qr{curl.*boot.sh} ]
+ ! should not have_dpath > .travis.yml has dpath //install/*[ value =~ qr{chmod.*boot} ]
+ ! should not have_dpath > .travis.yml has dpath //install/*[ value =~ qr{export BOOT_JVM_OPTIONS=} ]
+ ! should exist > .gitignore does not exist
+ ! should not have_dpath > jitpack.yml has dpath //jdk
+ ! should not have_dpath > jitpack.yml has dpath //env
+ ! should not have_dpath > jitpack.yml has dpath //env/*[ key eq "BOOT_VERSION" && value eq "2.7.1" ]
+ ! should have_dpath > jitpack.yml does not have dpath //before_install/*[ value =~ qr{curl.*init.sh} ]
+ ! should have_dpath > jitpack.yml does not have dpath //before_install/*[ value =~ qr{source init.sh} ]
+ ! should have_dpath > jitpack.yml does not have dpath //before_install/*[ value =~ qr{install_jdk} ]
+ ! should have_dpath > jitpack.yml does not have dpath //before_install/*[ value =~ qr{install_boot} ]
+ ! should have_dpath > jitpack.yml does not have dpath //before_install/*[ value =~ qr{setup_boot_env} ]
+```
+
+With `DEBUG=1` in `ENV`
+
+```
+   should exist: boot.properties exists
+   test   exist: boot.properties exists
+   should have_line_matching: boot.properties has line matching (?^:\ABOOT_CLOJURE_VERSION=1\.9\.0\-alpha15\z)
+   should have_line_matching: boot.properties has line matching (?^:\ABOOT_VERSION=2\.7\.1\z)
+   should exist: build.boot exists
+   should exist: CHANGELOG exists
+   test   exist: CHANGELOG exists
+   should be_in_git: In a valid git repo
+   test   be_in_git: In a valid git repo
+   should have_line_matching: CHANGELOG has line matching (?^:\Av?0\.1\.0($|\s+-\s+\S)) ( Version = 0.1.0 )
+ ! should have_tag_matching > No such tag matching (?^:\Av?0\.1\.1\z) ( Version = 0.1.1 )
+   should have_tag_matching: Has tag matching (?^:\Av?0\.1\.0\z) ( Version = 0.1.0 )
+   should exist: README.md exists
+   should exist: .travis.yml exists
+   test   exist: .travis.yml exists
+ ! should have_dpath > .travis.yml does not have dpath //matrix/include/*/*[ key eq q[env] && value eq q[JDK=zulu8] ]
+   should have_dpath: .travis.yml has dpath //cache
+ ! should have_dpath > .travis.yml does not have dpath //language[ value eq q{generic} ]
+ ! should have_dpath > .travis.yml does not have dpath //cache/directories/*[ value =~ qr{$HOME/zulu} ]
+ ! should have_dpath > .travis.yml does not have dpath //matrix/allow_failures
+   should have_dpath: .travis.yml has dpath //sudo
+   should have_dpath: .travis.yml has dpath //script
+   should have_dpath: .travis.yml has dpath //install
+ ! should have_dpath > .travis.yml does not have dpath //before_install/*[ value =~ qr{curl.*init.sh} ]
+ ! should have_dpath > .travis.yml does not have dpath //before_install/*[ value =~ qr{source init.sh} ]
+ ! should have_dpath > .travis.yml does not have dpath //before_install/*[ value =~ qr{install_jdk} ]
+ ! should have_dpath > .travis.yml does not have dpath //before_install/*[ value =~ qr{install_boot} ]
+ ! should have_dpath > .travis.yml does not have dpath //before_install/*[ value =~ qr{setup_boot_env} ]
+ ! should not have_dpath > .travis.yml has dpath //install/*[ value =~ qr{curl.*boot.sh} ]
+ ! should not have_dpath > .travis.yml has dpath //install/*[ value =~ qr{chmod.*boot} ]
+ ! should not have_dpath > .travis.yml has dpath //install/*[ value =~ qr{export BOOT_JVM_OPTIONS=} ]
+ ! should exist > .gitignore does not exist
+   test   exist: .gitignore does not exist
+   should exist: jitpack.yml exists
+   test   exist: jitpack.yml exists
+ ! should not have_dpath > jitpack.yml has dpath //jdk
+ ! should not have_dpath > jitpack.yml has dpath //env
+ ! should not have_dpath > jitpack.yml has dpath //env/*[ key eq "BOOT_VERSION" && value eq "2.7.1" ]
+ ! should have_dpath > jitpack.yml does not have dpath //before_install/*[ value =~ qr{curl.*init.sh} ]
+ ! should have_dpath > jitpack.yml does not have dpath //before_install/*[ value =~ qr{source init.sh} ]
+ ! should have_dpath > jitpack.yml does not have dpath //before_install/*[ value =~ qr{install_jdk} ]
+ ! should have_dpath > jitpack.yml does not have dpath //before_install/*[ value =~ qr{install_boot} ]
+ ! should have_dpath > jitpack.yml does not have dpath //before_install/*[ value =~ qr{setup_boot_env} ]
+   should exist: .mailmap exists
+   test   exist: .mailmap exists
+   should exist: resources exists
+   test   exist: resources exists
+   should exist: resources/README.md exists
+```
