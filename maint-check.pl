@@ -113,7 +113,7 @@ sub check_travis_yml {
 
     my $boot_version = $opts->{boot_version};
     my $jdk8_rule =
-      '//matrix/include/*/*[ key eq q[env] && value eq q[JDK=zulu8] ]';
+      '//matrix/include/*/*[ key eq q[env] && value =~ qr[JDK=zulu8] ]';
 
     yaml->should( have_dpath => $file, $jdk8_rule );
     yaml->should( have_dpath => $file, '//cache' );
