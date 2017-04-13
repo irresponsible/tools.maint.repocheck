@@ -118,7 +118,7 @@ sub check_travis_yml {
     yaml->should( have_dpath => $file, $jdk8_rule );
     yaml->should( have_dpath => $file, '//cache' );
     yaml->should( have_dpath => $file, '//language[ value eq q{generic} ]' );
-    yaml->should(
+    yaml->should_not(
         have_dpath => $file,
         '//cache/directories/*[ value =~ qr{$HOME/zulu} ]'
     );
