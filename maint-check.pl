@@ -10,7 +10,7 @@ use My::Assert::YAML qw/yaml/;
 use My::Assert::Git qw/git/;
 
 use constant BOOT_VERSION    => '2.7.1';
-use constant CLOJURE_VERSION => '1.9.0-alpha15';
+use constant CLOJURE_VERSION => '1.9.0-alpha16';
 
 check_boot_properties(
     'boot.properties' => {
