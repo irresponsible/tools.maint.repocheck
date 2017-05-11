@@ -18,6 +18,7 @@ our $ASSERT_PATH = My::Generic::Assertions->new(
     -tests               => {
         exist              => \&test_exist,
         have_line_matching => \&test_have_line_matching,
+        be_symlink         => \&test_be_symlink,
     },
     '-get_handler' => \&handle_get,
 );
@@ -57,6 +58,11 @@ sub test_have_line_matching {
     return ( 0, "$_[0] does not have line matching ${re}${smessage}" )
       unless grep { $_ =~ $re } _getlines( $_[0] );
     return ( 1, "$_[0] has line matching ${re}${smessage}" );
+}
+
+sub test_be_symlink {
+    return ( 0, "$_[0] is not a symlink" ) unless -l "$_[0]";
+    return ( 1, "$_[0] is a symlink" );
 }
 
 sub handle_get {

@@ -103,6 +103,8 @@ sub check_tags_for_changelog {
 sub check_readme {
     my ($file) = @_;
     path->should( exist => $file );
+    return unless path->test( exist => $file );
+    path->should_not( be_symlink => $file );
 }
 
 sub check_travis_yml {
@@ -218,4 +220,7 @@ sub check_resources {
     path->should( 'exist' => $dir );
     return unless path->test( 'exist' => $dir );
     path->should( 'exist' => $dir . '/README.md' );
+    return unless path->test( exist => $dir . '/README.md' );
+    path->should( 'be_symlink' => $dir . '/README.md' );
+
 }
